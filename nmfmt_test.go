@@ -136,7 +136,7 @@ func BenchmarkFprintf(b *testing.B) {
 			buf.Reset()
 			fmt.Fprintf(buf,
 				"%s's age is %d, and has %s",
-				"Player", i, "Posion")
+				"Player", i, "Potion")
 		}
 	})
 
@@ -159,7 +159,7 @@ func BenchmarkSprintf(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			_ = fmt.Sprintf(
 				"%s's age is %d, and has %s",
-				"Player", i, "Posion")
+				"Player", i, "Potion")
 		}
 	})
 

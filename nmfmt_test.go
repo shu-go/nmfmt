@@ -172,4 +172,19 @@ func BenchmarkSprintf(b *testing.B) {
 			)
 		}
 	})
+
+	b.Run("std no%", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_ = fmt.Sprintf("hello")
+		}
+	})
+
+	b.Run("nm no$", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			nmfmt.Sprintf("hello", nil)
+		}
+	})
+
 }

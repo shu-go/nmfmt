@@ -80,7 +80,7 @@ func (f *Formatter) Printf(format string, m map[string]any) (int, error) {
 		return fmt.Printf(format)
 	}
 
-	cn := f.cache.get(format, m)
+	cn := f.cache.get(format)
 
 	aa, err := cn.construct(m, &f.aPool)
 	if err != nil {
@@ -103,7 +103,7 @@ func (f *Formatter) Fprintf(w io.Writer, format string, m map[string]any) (int, 
 		return fmt.Fprintf(w, format)
 	}
 
-	cn := f.cache.get(format, m)
+	cn := f.cache.get(format)
 
 	aa, err := cn.construct(m, &f.aPool)
 	if err != nil {
@@ -126,7 +126,7 @@ func (f *Formatter) Sprintf(format string, m map[string]any) string {
 		return fmt.Sprintf(format)
 	}
 
-	cn := f.cache.get(format, m)
+	cn := f.cache.get(format)
 
 	aa, err := cn.construct(m, &f.aPool)
 	if err != nil {
@@ -149,7 +149,7 @@ func (f *Formatter) Errorf(format string, m map[string]any) error {
 		return fmt.Errorf(format)
 	}
 
-	cn := f.cache.get(format, m)
+	cn := f.cache.get(format)
 
 	aa, err := cn.construct(m, &f.aPool)
 	if err != nil {

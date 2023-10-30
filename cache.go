@@ -19,7 +19,7 @@ func newCache(refreshRate int) *cache {
 	}
 }
 
-func (c *cache) get(format string, a map[string]any) (cn cachenode) {
+func (c *cache) get(format string) (cn cachenode) {
 	c.m.Lock()
 
 	var found bool
@@ -28,7 +28,7 @@ func (c *cache) get(format string, a map[string]any) (cn cachenode) {
 		return
 	}
 
-	cn = newCacheNode(format, a)
+	cn = newCacheNode(format)
 	c.cachemisses++
 	if c.cachemisses >= c.cacheResetLimit {
 		c.cachemisses = 0
@@ -44,7 +44,7 @@ type cachenode struct {
 	aorder []string
 }
 
-func newCacheNode(format string, a map[string]any) cachenode {
+func newCacheNode(format string) cachenode {
 	indices := placeholderRE.FindAllStringSubmatchIndex(format, -1)
 	if len(indices) == 0 {
 		return cachenode{format: format}

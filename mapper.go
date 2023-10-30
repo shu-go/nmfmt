@@ -13,13 +13,13 @@ func Named(nameAndValue ...any) map[string]any {
 	m := make(map[string]any)
 
 	var name string
-	for i, v := range nameAndValue {
+	for i := 0; i < len(nameAndValue); i++ {
 		if i%2 == 0 {
-			name = v.(string)
+			name = nameAndValue[i].(string)
 			continue
 		}
 
-		m[name] = v
+		m[name] = nameAndValue[i]
 	}
 
 	return m

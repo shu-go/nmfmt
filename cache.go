@@ -52,7 +52,7 @@ func newCacheNode(format string, a map[string]any) cachenode {
 	var caorder []string
 
 	last := 0
-	for i := range indices {
+	for i := 0; i < len(indices); i++ {
 		cformat += format[last:indices[i][0]]
 
 		index := indices[i]
@@ -84,12 +84,8 @@ func (c cachenode) construct(a map[string]any, aPool *sync.Pool) (*[]any, error)
 	aa := aPool.Get().(*[]any)
 	*aa = (*aa)[:0]
 
-	for _, name := range c.aorder {
-		if v, found := a[name]; found {
-			*aa = append(*aa, v)
-		} else {
-			*aa = append(*aa, nil)
-		}
+	for i := 0; i < len(c.aorder); i++ {
+		*aa = append(*aa, a[c.aorder[i]])
 	}
 
 	return aa, nil

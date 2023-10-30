@@ -187,4 +187,18 @@ func BenchmarkSprintf(b *testing.B) {
 		}
 	})
 
+	b.Run("std 1", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_ = fmt.Sprintf("hello, %s", "Player")
+		}
+	})
+
+	b.Run("nm 1", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			nmfmt.Sprintf("hello, $Name", nmfmt.Named("Name", "Player"))
+		}
+	})
+
 }

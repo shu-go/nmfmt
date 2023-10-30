@@ -19,14 +19,16 @@ func newCache(refreshRate int) *cache {
 	}
 }
 
-func (c *cache) get(format string, a map[string]any) cachenode {
+func (c *cache) get(format string, a map[string]any) (cn cachenode) {
 	c.m.Lock()
-	if cn, found := c.nodes[format]; found {
+
+	var found bool
+	if cn, found = c.nodes[format]; found {
 		c.m.Unlock()
-		return cn
+		return
 	}
 
-	cn := newCacheNode(format, a)
+	cn = newCacheNode(format, a)
 	c.cachemisses++
 	if c.cachemisses >= c.cacheResetLimit {
 		c.cachemisses = 0
@@ -34,7 +36,7 @@ func (c *cache) get(format string, a map[string]any) cachenode {
 	}
 	c.nodes[format] = cn
 	c.m.Unlock()
-	return cn
+	return
 }
 
 type cachenode struct {

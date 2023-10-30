@@ -76,22 +76,10 @@ func New(opts ...OptionFunc) Formatter {
 }
 
 func (f *Formatter) Printf(format string, m map[string]any) (int, error) {
-	return f.printfMap(format, m)
-}
+	if len(m) == 0 {
+		return fmt.Printf(format)
+	}
 
-func (f *Formatter) Fprintf(w io.Writer, format string, m map[string]any) (int, error) {
-	return f.fprintfMap(w, format, m)
-}
-
-func (f *Formatter) Sprintf(format string, m map[string]any) string {
-	return f.sprintfMap(format, m)
-}
-
-func (f *Formatter) Errorf(format string, m map[string]any) error {
-	return f.errorfMap(format, m)
-}
-
-func (f *Formatter) printfMap(format string, m map[string]any) (int, error) {
 	cn := f.cache.get(format, m)
 
 	aa, err := cn.construct(m, &f.aPool)
@@ -110,7 +98,11 @@ func (f *Formatter) printfMap(format string, m map[string]any) (int, error) {
 	return n, err
 }
 
-func (f *Formatter) fprintfMap(w io.Writer, format string, m map[string]any) (int, error) {
+func (f *Formatter) Fprintf(w io.Writer, format string, m map[string]any) (int, error) {
+	if len(m) == 0 {
+		return fmt.Fprintf(w, format)
+	}
+
 	cn := f.cache.get(format, m)
 
 	aa, err := cn.construct(m, &f.aPool)
@@ -129,7 +121,11 @@ func (f *Formatter) fprintfMap(w io.Writer, format string, m map[string]any) (in
 	return n, err
 }
 
-func (f *Formatter) sprintfMap(format string, m map[string]any) string {
+func (f *Formatter) Sprintf(format string, m map[string]any) string {
+	if len(m) == 0 {
+		return fmt.Sprintf(format)
+	}
+
 	cn := f.cache.get(format, m)
 
 	aa, err := cn.construct(m, &f.aPool)
@@ -148,7 +144,11 @@ func (f *Formatter) sprintfMap(format string, m map[string]any) string {
 	return s
 }
 
-func (f *Formatter) errorfMap(format string, m map[string]any) error {
+func (f *Formatter) Errorf(format string, m map[string]any) error {
+	if len(m) == 0 {
+		return fmt.Errorf(format)
+	}
+
 	cn := f.cache.get(format, m)
 
 	aa, err := cn.construct(m, &f.aPool)

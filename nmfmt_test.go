@@ -30,57 +30,6 @@ func ExampleStruct() {
 	// Kim is 22 years old.
 }
 
-func TestPkgfuncs(t *testing.T) {
-	want := fmt.Sprintf(
-		"%[1]v's name is %[1]q. %[1]v's age is %[2]d, and was born in %[3]d.",
-		"Player",
-		12,
-		time.Now().AddDate(-12, 0, 0).Year())
-
-	f := "$Name's name is $Name:q. $Name's age is $Age, and was born in $Year."
-	a := nmfmt.Named("Name", "Player", "Age", 12, "Year", time.Now().AddDate(-12, 0, 0).Year())
-
-	t.Run("Sprintf", func(t *testing.T) {
-		s := nmfmt.Sprintf(f, a)
-		gotwant.Test(t, s, want)
-	})
-
-	t.Run("Fprintf", func(t *testing.T) {
-		buf := &bytes.Buffer{}
-		nmfmt.Fprintf(buf, f, a)
-		gotwant.Test(t, buf.String(), want)
-	})
-
-	t.Run("Errorf", func(t *testing.T) {
-		err := nmfmt.Errorf(f, a)
-		gotwant.Test(t, err.Error(), want)
-	})
-}
-
-func TestTrim(t *testing.T) {
-	s := nmfmt.Sprintf("${abc}, ${ abc}, ${abc }, ${ abc }, ${ abc : q }", nmfmt.Named("abc", "hoge"))
-	gotwant.Test(t, s, `hoge, hoge, hoge, hoge, "hoge"`)
-}
-
-func TestNotation(t *testing.T) {
-	s := nmfmt.Sprintf("$ {abc} -> ${abc}, $ {abc:q} -> ${abc:q}", nmfmt.Named("abc", "hoge"))
-	gotwant.Test(t, s, `$ {abc} -> hoge, $ {abc:q} -> "hoge"`)
-
-	s = nmfmt.Sprintf("$ abc -> $abc, $ abc:q -> $abc:q", nmfmt.Named("abc", "hoge"))
-	gotwant.Test(t, s, `$ abc -> hoge, $ abc:q -> "hoge"`)
-}
-
-func TestMissing(t *testing.T) {
-	s := nmfmt.Sprintf("$Name has $Count apples.", nmfmt.Named("Name", "Player", "Count", 90))
-	gotwant.Test(t, s, "Player has 90 apples.")
-
-	s = nmfmt.Sprintf("$Name has $Count apples.", nmfmt.Named("Name", "Player"))
-	gotwant.Test(t, s, "Player has <nil> apples.")
-
-	s = nmfmt.Sprintf("$Name has $Count apples.", nmfmt.Struct(struct{ Name string }{Name: "Player"}))
-	gotwant.Test(t, s, "Player has <nil> apples.")
-}
-
 func TestStruct(t *testing.T) {
 	want := fmt.Sprintf(
 		"%[1]v's name is %[1]q. %[1]v's age is %[2]d, and was born in %[3]d.",

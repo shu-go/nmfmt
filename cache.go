@@ -59,7 +59,10 @@ func newCacheNode(format string) cachenode {
 
 		index := indices[i]
 
-		name, verb := extract(format, index)
+		name, verb, eq := extract(format, index)
+		if eq {
+			cformat += name + "="
+		}
 		if verb == "" { // not found
 			cformat += "%v"
 		} else {

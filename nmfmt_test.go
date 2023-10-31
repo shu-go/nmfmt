@@ -21,6 +21,13 @@ func Example() {
 	// Kim Kim "Kim" "Kim"aaa
 }
 
+func Example_debug() {
+	nmfmt.Printf("$=greeting:q, $=name\n", nmfmt.Named("name", "Kim", "greeting", "Hello"))
+
+	// Output:
+	// greeting="Hello", name=Kim
+}
+
 func ExampleStruct() {
 	nmfmt.Printf("$Name is $Age years old.\n", nmfmt.Struct(struct {
 		Name string
@@ -124,6 +131,20 @@ func TestVSStd(t *testing.T) {
 			nminput:      "${ Greeting }, ${ Greeting : q }, ${ID}",
 			nmargs:       map[string]any{"Greeting": "Hello"},
 		},
+		{
+			desc:     "Arg=Arg",
+			stdinput: "Greeting=%[1]q",
+			stdargs:  []any{"Hello"},
+			nminput:  "$=Greeting:q",
+			nmargs:   map[string]any{"Greeting": "Hello"},
+		},
+		{
+			desc:     "Arg=Arg",
+			stdinput: "Greeting=%[1]q",
+			stdargs:  []any{"Hello"},
+			nminput:  "${=Greeting:q}",
+			nmargs:   map[string]any{"Greeting": "Hello"},
+		},
 	}
 
 	// also shows how they are inconpatible
@@ -138,7 +159,7 @@ func TestVSStd(t *testing.T) {
 			if c.inconpatible {
 				fmt.Fprintf(os.Stderr, "%s\nstd: %s\nnm: %s\n", c.desc, stdb.String(), nmb.String())
 			} else {
-				gotwant.Test(t, stdb.Bytes(), nmb.Bytes(), gotwant.Format("%q"), gotwant.Desc(c.desc))
+				gotwant.Test(t, nmb.Bytes(), stdb.Bytes(), gotwant.Format("%q"), gotwant.Desc(c.desc))
 			}
 		}
 	})
@@ -150,7 +171,7 @@ func TestVSStd(t *testing.T) {
 			nms := nmfmt.Sprintf(c.nminput, c.nmargs)
 
 			if !c.inconpatible {
-				gotwant.Test(t, stds, nms, gotwant.Format("%q"))
+				gotwant.Test(t, nms, stds, gotwant.Format("%q"))
 			}
 		}
 	})
@@ -162,7 +183,7 @@ func TestVSStd(t *testing.T) {
 			nms := nmfmt.Errorf(c.nminput, c.nmargs)
 
 			if !c.inconpatible {
-				gotwant.Test(t, stds, nms, gotwant.Format("%q"))
+				gotwant.Test(t, nms, stds, gotwant.Format("%q"))
 			}
 		}
 	})

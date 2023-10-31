@@ -3,6 +3,7 @@ package nmfmt_test
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -28,6 +29,143 @@ func ExampleStruct() {
 
 	// Output:
 	// Kim is 22 years old.
+}
+
+func TestVSStd(t *testing.T) {
+	cases := []struct {
+		stdinput string
+		stdargs  []any
+
+		nminput string
+		nmargs  map[string]any
+
+		inconpatible bool
+		desc         string
+	}{
+		{
+			stdinput: "",
+			nminput:  "",
+		},
+		{
+			stdinput: "a",
+			nminput:  "a",
+		},
+		{
+			stdinput: "\n",
+			nminput:  "\n",
+		},
+		{
+			stdinput: "hello\n",
+			nminput:  "hello\n",
+		},
+		{
+			stdinput: "hello\nworld",
+			nminput:  "hello\nworld",
+		},
+		{
+			inconpatible: true,
+			desc:         "extra",
+			stdinput:     "a",
+			stdargs:      []any{"hoge"},
+			nminput:      "a",
+			nmargs:       map[string]any{"1": "hoge"},
+		},
+		{
+			stdinput: "hello, %s",
+			stdargs:  []any{"Player"},
+			nminput:  "hello, $Name",
+			nmargs:   map[string]any{"Name": "Player"},
+		},
+		{
+			stdinput: "%s, %s",
+			stdargs:  []any{"Hello", "Player"},
+			nminput:  "$Greeting, $Name",
+			nmargs:   map[string]any{"Greeting": "Hello", "Name": "Player"},
+		},
+		{
+			stdinput: "%[1]s, %[2]s",
+			stdargs:  []any{"Hello", "Player"},
+			nminput:  "$Greeting, $Name",
+			nmargs:   map[string]any{"Greeting": "Hello", "Name": "Player"},
+		},
+		{
+			desc:     "positional",
+			stdinput: "%[2]s, %[1]s",
+			stdargs:  []any{"Hello", "Player"},
+			nminput:  "$Name, $Greeting",
+			nmargs:   map[string]any{"Greeting": "Hello", "Name": "Player"},
+		},
+		{
+			desc:     "position repeated",
+			stdinput: "%[2]s, %[1]s, %[2]s",
+			stdargs:  []any{"Hello", "Player"},
+			nminput:  "$Name, $Greeting, $Name",
+			nmargs:   map[string]any{"Greeting": "Hello", "Name": "Player"},
+		},
+		{
+			desc:     "position repeated",
+			stdinput: "%[1]s, %[1]q, %[2]d",
+			stdargs:  []any{"Hello", 42},
+			nminput:  "$Greeting, $Greeting:q, $ID",
+			nmargs:   map[string]any{"Greeting": "Hello", "ID": 42},
+		},
+		{
+			desc:     "verb",
+			stdinput: "%[1]s, %[1]q, %[2]d",
+			stdargs:  []any{"Hello", 42},
+			nminput:  "${ Greeting }, ${ Greeting : q }, ${ID}",
+			nmargs:   map[string]any{"Greeting": "Hello", "ID": 42},
+		},
+		{
+			inconpatible: true,
+			desc:         "missing arg",
+			stdinput:     "%[1]s, %[1]q, %[2]d",
+			stdargs:      []any{"Hello"},
+			nminput:      "${ Greeting }, ${ Greeting : q }, ${ID}",
+			nmargs:       map[string]any{"Greeting": "Hello"},
+		},
+	}
+
+	// also shows how they are inconpatible
+	t.Run("Fprintf", func(t *testing.T) {
+		for _, c := range cases {
+			stdb := &bytes.Buffer{}
+			nmb := &bytes.Buffer{}
+
+			fmt.Fprintf(stdb, c.stdinput, c.stdargs...)
+			nmfmt.Fprintf(nmb, c.nminput, c.nmargs)
+
+			if c.inconpatible {
+				fmt.Fprintf(os.Stderr, "%s\nstd: %s\nnm: %s\n", c.desc, stdb.String(), nmb.String())
+			} else {
+				gotwant.Test(t, stdb.Bytes(), nmb.Bytes(), gotwant.Format("%q"), gotwant.Desc(c.desc))
+			}
+		}
+	})
+
+	t.Run("Sprintf", func(t *testing.T) {
+		for _, c := range cases {
+
+			stds := fmt.Sprintf(c.stdinput, c.stdargs...)
+			nms := nmfmt.Sprintf(c.nminput, c.nmargs)
+
+			if !c.inconpatible {
+				gotwant.Test(t, stds, nms, gotwant.Format("%q"))
+			}
+		}
+	})
+
+	t.Run("Errorf", func(t *testing.T) {
+		for _, c := range cases {
+
+			stds := fmt.Errorf(c.stdinput, c.stdargs...)
+			nms := nmfmt.Errorf(c.nminput, c.nmargs)
+
+			if !c.inconpatible {
+				gotwant.Test(t, stds, nms, gotwant.Format("%q"))
+			}
+		}
+	})
 }
 
 func TestStruct(t *testing.T) {

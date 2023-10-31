@@ -25,6 +25,13 @@ func Example() {
 	// Kim Kim "Kim" "Kim"aaa
 }
 
+func Example_debug() {
+	nmfmt.Printf("$=greeting:q, $=name\n", nmfmt.Named("name", "Kim", "greeting", "Hello"))
+
+	// Output:
+	// greeting="Hello", name=Kim
+}
+
 func ExampleStruct() {
 	nmfmt.Printf("$Name is $Age years old.\n", nmfmt.Struct(struct {
 		Name string
@@ -58,6 +65,12 @@ Must match \w.
 Defaults to `v`.
 
 See https://pkg.go.dev/fmt.
+
+### debug notation
+
+If a placeholder starts with `$=`, the output starts with the name of the placeholder followed by `=`.
+
+`$=name` -> `name=NAME_VALUE`
 
 ## Performance
 

@@ -28,6 +28,12 @@
 // Defaults to `v`.
 //
 // See https://pkg.go.dev/fmt.
+//
+// # debug notation
+//
+// If a placeholder starts with `$=`, the output starts with the name of the placeholder followed by `=`.
+//
+// `$=name` -> `name=NAME_VALUE`
 package nmfmt
 
 import (

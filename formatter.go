@@ -3,51 +3,8 @@ package nmfmt
 import (
 	"fmt"
 	"io"
-	"regexp"
-	"strings"
 	"sync"
 )
-
-/*
-var placeholderRE = regexp.MustCompile(`{([^:{}}]+)(?::([^{}}]+))?}`)
-var extract = func(format string, index []int) (string, string) {
-	name := strings.TrimSpace(format[index[2]:index[3]])
-	verb := ""
-	if index[4] != -1 {
-		verb = strings.TrimSpace(format[index[4]:index[5]])
-	}
-	return name, verb
-}
-*/
-
-var placeholderRE = regexp.MustCompile(`(?:\$(=?\w+)(?::(\w+))?)|(?:\${(=?[^:{}}]+)(?::([^{}}]+))?})`)
-var extract = func(format string, index []int) (string, string, bool) {
-	var eq bool
-
-	if index[2] != -1 {
-		name := strings.TrimSpace(format[index[2]:index[3]])
-		if strings.HasPrefix(name, "=") {
-			name = name[1:]
-			eq = true
-		}
-		verb := ""
-		if index[4] != -1 {
-			verb = strings.TrimSpace(format[index[4]:index[5]])
-		}
-		return name, verb, eq
-	}
-
-	name := strings.TrimSpace(format[index[6]:index[7]])
-	if strings.HasPrefix(name, "=") {
-		name = name[1:]
-		eq = true
-	}
-	verb := ""
-	if index[8] != -1 {
-		verb = strings.TrimSpace(format[index[8]:index[9]])
-	}
-	return name, verb, eq
-}
 
 type formatterOptions struct {
 	cacheResetLimit int

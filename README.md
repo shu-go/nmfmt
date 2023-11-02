@@ -8,17 +8,37 @@ Package nmfmt wraps fmt.Xprintf functions providing $name style placeholders.
 
 Each nmfmt.Xprintf function has a signature like:
 
- func Printf(format string, m map[string]any) (int, error)
+ func Printf(format string, a...any) (int, error)
 
-And prints according to a format that contains $name style placeholders.
+and prints according to a format that contains $name style placeholders.
+
+See examples below.
 
 ## Examples
 
 ```go
 func Example() {
-	nmfmt.Printf("$name is $age years old.\n", nmfmt.Named("name", "Kim", "age", 22))
+	nmfmt.Printf("$name is $age years old.\n", "name", "Kim", "age", 22)
 
-	nmfmt.Printf("$name ${ name } $name:q ${name:q}aaa\n", nmfmt.Named("name", "Kim", "age", 22))
+	nmfmt.Printf("$name ${ name } $name:q ${name:q}aaa\n", "name", "Kim", "age", 22)
+
+	// Output:
+	// Kim is 22 years old.
+	// Kim Kim "Kim" "Kim"aaa
+}
+
+func Example_map() {
+	nmfmt.Printf("$name is $age years old.\n",
+		nmfmt.M{
+			"name": "Kim",
+			"age":  22,
+		})
+
+	nmfmt.Printf("$name ${ name } $name:q ${name:q}aaa\n",
+		nmfmt.M{
+			"name": "Kim",
+			"age":  22,
+		})
 
 	// Output:
 	// Kim is 22 years old.
@@ -26,7 +46,7 @@ func Example() {
 }
 
 func Example_debug() {
-	nmfmt.Printf("$=greeting:q, $=name\n", nmfmt.Named("name", "Kim", "greeting", "Hello"))
+	nmfmt.Printf("$=greeting:q, $=name\n", "name", "Kim", "greeting", "Hello")
 
 	// Output:
 	// greeting="Hello", name=Kim
@@ -36,7 +56,7 @@ func ExampleStruct() {
 	nmfmt.Printf("$Name is $Age years old.\n", nmfmt.Struct(struct {
 		Name string
 		Age  int
-	}{Name: "Kim", Age: 22}))
+	}{Name: "Kim", Age: 22})...)
 
 	// Output:
 	// Kim is 22 years old.
@@ -79,12 +99,13 @@ nmfmt (nm) V.S. fmt (std)
 About 2 times slower.
 
 ```
-BenchmarkStruct/nm-16    3499479               333.2 ns/op           448 B/op          8 allocs/op
-BenchmarkFprintf/std-16                 16273215                71.12 ns/op            8 B/op          0 allocs/op
-BenchmarkFprintf/nm-16                   8108190               141.6 ns/op             8 B/op          0 allocs/op
-BenchmarkSprintf/std-16                 13886348                84.93 ns/op           56 B/op          2 allocs/op
-BenchmarkSprintf/nm-16                   7585075               156.1 ns/op            56 B/op          2 allocs/op
-PASS
+BenchmarkFprintf/std-16                 15291902                68.96 ns/op            8 B/op          0 allocs/op
+BenchmarkFprintf/nm-16                  10768531               104.7 ns/op             8 B/op          0 allocs/op
+BenchmarkSprintf/std-16                 13844199                83.69 ns/op           56 B/op          2 allocs/op
+BenchmarkSprintf/nm-16                   9587182               121.4 ns/op            56 B/op          2 allocs/op
+BenchmarkArgType/Map-16                  4894358               246.4 ns/op           392 B/op          4 allocs/op
+BenchmarkArgType/Slice-16                9449457               123.4 ns/op            56 B/op          2 allocs/op
+BenchmarkArgType/Struct-16               3580132               336.6 ns/op           288 B/op         10 allocs/op
 ```
 
 ### Code (Fprintf)
@@ -115,7 +136,6 @@ func BenchmarkFprintf(b *testing.B) {
 	})
 }
 ```
-
 
 ----
 

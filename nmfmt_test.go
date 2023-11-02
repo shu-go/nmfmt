@@ -12,9 +12,9 @@ import (
 )
 
 func Example() {
-	nmfmt.Printf("$name is $age years old.\n", nmfmt.Named("name", "Kim", "age", 22))
+	nmfmt.Printf("$name is $age years old.\n", "name", "Kim", "age", 22)
 
-	nmfmt.Printf("$name ${ name } $name:q ${name:q}aaa\n", nmfmt.Named("name", "Kim", "age", 22))
+	nmfmt.Printf("$name ${ name } $name:q ${name:q}aaa\n", "name", "Kim", "age", 22)
 
 	// Output:
 	// Kim is 22 years old.
@@ -22,7 +22,7 @@ func Example() {
 }
 
 func Example_debug() {
-	nmfmt.Printf("$=greeting:q, $=name\n", nmfmt.Named("name", "Kim", "greeting", "Hello"))
+	nmfmt.Printf("$=greeting:q, $=name\n", "name", "Kim", "greeting", "Hello")
 
 	// Output:
 	// greeting="Hello", name=Kim
@@ -32,7 +32,7 @@ func ExampleStruct() {
 	nmfmt.Printf("$Name is $Age years old.\n", nmfmt.Struct(struct {
 		Name string
 		Age  int
-	}{Name: "Kim", Age: 22}))
+	}{Name: "Kim", Age: 22})...)
 
 	// Output:
 	// Kim is 22 years old.
@@ -40,35 +40,35 @@ func ExampleStruct() {
 
 func TestNotation(t *testing.T) {
 	t.Run("Boundary", func(t *testing.T) {
-		gotwant.Test(t, nmfmt.Sprintf("hello, $Name.", nmfmt.Named("Name", "Hoge")), "hello, Hoge.")
-		gotwant.Test(t, nmfmt.Sprintf("hello, $Name", nmfmt.Named("Name", "Hoge")), "hello, Hoge")
-		gotwant.Test(t, nmfmt.Sprintf("$Name, hello", nmfmt.Named("Name", "Hoge")), "Hoge, hello")
-		gotwant.Test(t, nmfmt.Sprintf("$Name, hello.", nmfmt.Named("Name", "Hoge")), "Hoge, hello.")
+		gotwant.Test(t, nmfmt.Sprintf("hello, $Name.", "Name", "Hoge"), "hello, Hoge.")
+		gotwant.Test(t, nmfmt.Sprintf("hello, $Name", "Name", "Hoge"), "hello, Hoge")
+		gotwant.Test(t, nmfmt.Sprintf("$Name, hello", "Name", "Hoge"), "Hoge, hello")
+		gotwant.Test(t, nmfmt.Sprintf("$Name, hello.", "Name", "Hoge"), "Hoge, hello.")
 
-		gotwant.Test(t, nmfmt.Sprintf("hello, ${Name}.", nmfmt.Named("Name", "Hoge")), "hello, Hoge.")
-		gotwant.Test(t, nmfmt.Sprintf("hello, ${Name}", nmfmt.Named("Name", "Hoge")), "hello, Hoge")
-		gotwant.Test(t, nmfmt.Sprintf("${Name}, hello", nmfmt.Named("Name", "Hoge")), "Hoge, hello")
-		gotwant.Test(t, nmfmt.Sprintf("${Name}, hello.", nmfmt.Named("Name", "Hoge")), "Hoge, hello.")
+		gotwant.Test(t, nmfmt.Sprintf("hello, ${Name}.", "Name", "Hoge"), "hello, Hoge.")
+		gotwant.Test(t, nmfmt.Sprintf("hello, ${Name}", "Name", "Hoge"), "hello, Hoge")
+		gotwant.Test(t, nmfmt.Sprintf("${Name}, hello", "Name", "Hoge"), "Hoge, hello")
+		gotwant.Test(t, nmfmt.Sprintf("${Name}, hello.", "Name", "Hoge"), "Hoge, hello.")
 	})
 
 	t.Run("Verb", func(t *testing.T) {
-		gotwant.Test(t, nmfmt.Sprintf("$Name:q", nmfmt.Named("Name", "Hoge")), `"Hoge"`)
-		gotwant.Test(t, nmfmt.Sprintf("$Name:q.", nmfmt.Named("Name", "Hoge")), `"Hoge".`)
-		gotwant.Test(t, nmfmt.Sprintf("$Name:#v.", nmfmt.Named("Name", "Hoge")), `"Hoge".`)
-		gotwant.Test(t, nmfmt.Sprintf("$Name:+v.", nmfmt.Named("Name", "Hoge")), `Hoge.`)
-		gotwant.Test(t, nmfmt.Sprintf("$=Name:+v.", nmfmt.Named("Name", "Hoge")), `Name=Hoge.`)
+		gotwant.Test(t, nmfmt.Sprintf("$Name:q", "Name", "Hoge"), `"Hoge"`)
+		gotwant.Test(t, nmfmt.Sprintf("$Name:q.", "Name", "Hoge"), `"Hoge".`)
+		gotwant.Test(t, nmfmt.Sprintf("$Name:#v.", "Name", "Hoge"), `"Hoge".`)
+		gotwant.Test(t, nmfmt.Sprintf("$Name:+v.", "Name", "Hoge"), `Hoge.`)
+		gotwant.Test(t, nmfmt.Sprintf("$=Name:+v.", "Name", "Hoge"), `Name=Hoge.`)
 
-		gotwant.Test(t, nmfmt.Sprintf("${Name:q}", nmfmt.Named("Name", "Hoge")), `"Hoge"`)
-		gotwant.Test(t, nmfmt.Sprintf("${Name:q}.", nmfmt.Named("Name", "Hoge")), `"Hoge".`)
-		gotwant.Test(t, nmfmt.Sprintf("${Name:#v}.", nmfmt.Named("Name", "Hoge")), `"Hoge".`)
-		gotwant.Test(t, nmfmt.Sprintf("${Name:+v}.", nmfmt.Named("Name", "Hoge")), `Hoge.`)
-		gotwant.Test(t, nmfmt.Sprintf("${=Name:+v}.", nmfmt.Named("Name", "Hoge")), `Name=Hoge.`)
+		gotwant.Test(t, nmfmt.Sprintf("${Name:q}", "Name", "Hoge"), `"Hoge"`)
+		gotwant.Test(t, nmfmt.Sprintf("${Name:q}.", "Name", "Hoge"), `"Hoge".`)
+		gotwant.Test(t, nmfmt.Sprintf("${Name:#v}.", "Name", "Hoge"), `"Hoge".`)
+		gotwant.Test(t, nmfmt.Sprintf("${Name:+v}.", "Name", "Hoge"), `Hoge.`)
+		gotwant.Test(t, nmfmt.Sprintf("${=Name:+v}.", "Name", "Hoge"), `Name=Hoge.`)
 
-		gotwant.Test(t, nmfmt.Sprintf("${ Name:q }", nmfmt.Named("Name", "Hoge")), `"Hoge"`)
-		gotwant.Test(t, nmfmt.Sprintf("${ Name:q }.", nmfmt.Named("Name", "Hoge")), `"Hoge".`)
-		gotwant.Test(t, nmfmt.Sprintf("${ Name:#v }.", nmfmt.Named("Name", "Hoge")), `"Hoge".`)
-		gotwant.Test(t, nmfmt.Sprintf("${ Name:+v }.", nmfmt.Named("Name", "Hoge")), `Hoge.`)
-		gotwant.Test(t, nmfmt.Sprintf("${ =Name:+v }.", nmfmt.Named("Name", "Hoge")), `Name=Hoge.`)
+		gotwant.Test(t, nmfmt.Sprintf("${ Name:q }", "Name", "Hoge"), `"Hoge"`)
+		gotwant.Test(t, nmfmt.Sprintf("${ Name:q }.", "Name", "Hoge"), `"Hoge".`)
+		gotwant.Test(t, nmfmt.Sprintf("${ Name:#v }.", "Name", "Hoge"), `"Hoge".`)
+		gotwant.Test(t, nmfmt.Sprintf("${ Name:+v }.", "Name", "Hoge"), `Hoge.`)
+		gotwant.Test(t, nmfmt.Sprintf("${ =Name:+v }.", "Name", "Hoge"), `Name=Hoge.`)
 	})
 }
 
@@ -78,7 +78,7 @@ func TestVSStd(t *testing.T) {
 		stdargs  []any
 
 		nminput string
-		nmargs  map[string]any
+		nmargs  []any
 
 		inconpatible bool
 		desc         string
@@ -109,53 +109,53 @@ func TestVSStd(t *testing.T) {
 			stdinput:     "a",
 			stdargs:      []any{"hoge"},
 			nminput:      "a",
-			nmargs:       map[string]any{"1": "hoge"},
+			nmargs:       []any{"1", "hoge"},
 		},
 		{
 			stdinput: "hello, %s",
 			stdargs:  []any{"Player"},
 			nminput:  "hello, $Name",
-			nmargs:   map[string]any{"Name": "Player"},
+			nmargs:   []any{"Name", "Player"},
 		},
 		{
 			stdinput: "%s, %s",
 			stdargs:  []any{"Hello", "Player"},
 			nminput:  "$Greeting, $Name",
-			nmargs:   map[string]any{"Greeting": "Hello", "Name": "Player"},
+			nmargs:   []any{"Greeting", "Hello", "Name", "Player"},
 		},
 		{
 			stdinput: "%[1]s, %[2]s",
 			stdargs:  []any{"Hello", "Player"},
 			nminput:  "$Greeting, $Name",
-			nmargs:   map[string]any{"Greeting": "Hello", "Name": "Player"},
+			nmargs:   []any{"Greeting", "Hello", "Name", "Player"},
 		},
 		{
 			desc:     "positional",
 			stdinput: "%[2]s, %[1]s",
 			stdargs:  []any{"Hello", "Player"},
 			nminput:  "$Name, $Greeting",
-			nmargs:   map[string]any{"Greeting": "Hello", "Name": "Player"},
+			nmargs:   []any{"Greeting", "Hello", "Name", "Player"},
 		},
 		{
 			desc:     "position repeated",
 			stdinput: "%[2]s, %[1]s, %[2]s",
 			stdargs:  []any{"Hello", "Player"},
 			nminput:  "$Name, $Greeting, $Name",
-			nmargs:   map[string]any{"Greeting": "Hello", "Name": "Player"},
+			nmargs:   []any{"Greeting", "Hello", "Name", "Player"},
 		},
 		{
 			desc:     "position repeated",
 			stdinput: "%[1]s, %[1]q, %[2]d",
 			stdargs:  []any{"Hello", 42},
 			nminput:  "$Greeting, $Greeting:q, $ID",
-			nmargs:   map[string]any{"Greeting": "Hello", "ID": 42},
+			nmargs:   []any{"Greeting", "Hello", "ID", 42},
 		},
 		{
 			desc:     "verb",
 			stdinput: "%[1]s, %[1]q, %[2]d",
 			stdargs:  []any{"Hello", 42},
 			nminput:  "${ Greeting }, ${ Greeting : q }, ${ID}",
-			nmargs:   map[string]any{"Greeting": "Hello", "ID": 42},
+			nmargs:   []any{"Greeting", "Hello", "ID", 42},
 		},
 		{
 			inconpatible: true,
@@ -163,21 +163,21 @@ func TestVSStd(t *testing.T) {
 			stdinput:     "%[1]s, %[1]q, %[2]d",
 			stdargs:      []any{"Hello"},
 			nminput:      "${ Greeting }, ${ Greeting : q }, ${ID}",
-			nmargs:       map[string]any{"Greeting": "Hello"},
+			nmargs:       []any{"Greeting", "Hello"},
 		},
 		{
 			desc:     "Arg=Arg",
 			stdinput: "Greeting=%[1]q",
 			stdargs:  []any{"Hello"},
 			nminput:  "$=Greeting:q",
-			nmargs:   map[string]any{"Greeting": "Hello"},
+			nmargs:   []any{"Greeting", "Hello"},
 		},
 		{
 			desc:     "Arg=Arg",
 			stdinput: "Greeting=%[1]q",
 			stdargs:  []any{"Hello"},
 			nminput:  "${=Greeting:q}",
-			nmargs:   map[string]any{"Greeting": "Hello"},
+			nmargs:   []any{"Greeting", "Hello"},
 		},
 	}
 
@@ -188,7 +188,7 @@ func TestVSStd(t *testing.T) {
 			nmb := &bytes.Buffer{}
 
 			fmt.Fprintf(stdb, c.stdinput, c.stdargs...)
-			nmfmt.Fprintf(nmb, c.nminput, c.nmargs)
+			nmfmt.Fprintf(nmb, c.nminput, c.nmargs...)
 
 			if c.inconpatible {
 				fmt.Fprintf(os.Stderr, "%s\nstd: %s\nnm: %s\n", c.desc, stdb.String(), nmb.String())
@@ -202,7 +202,7 @@ func TestVSStd(t *testing.T) {
 		for _, c := range cases {
 
 			stds := fmt.Sprintf(c.stdinput, c.stdargs...)
-			nms := nmfmt.Sprintf(c.nminput, c.nmargs)
+			nms := nmfmt.Sprintf(c.nminput, c.nmargs...)
 
 			if !c.inconpatible {
 				gotwant.Test(t, nms, stds, gotwant.Format("%q"))
@@ -214,7 +214,7 @@ func TestVSStd(t *testing.T) {
 		for _, c := range cases {
 
 			stds := fmt.Errorf(c.stdinput, c.stdargs...)
-			nms := nmfmt.Errorf(c.nminput, c.nmargs)
+			nms := nmfmt.Errorf(c.nminput, c.nmargs...)
 
 			if !c.inconpatible {
 				gotwant.Test(t, nms, stds, gotwant.Format("%q"))
@@ -241,7 +241,7 @@ func TestStruct(t *testing.T) {
 		}{Year: time.Now().AddDate(-23, 0, 0).Year()},
 	)
 
-	gotwant.Test(t, nmfmt.Sprintf(f, a), want)
+	gotwant.Test(t, nmfmt.Sprintf(f, a...), want)
 }
 
 func BenchmarkStruct(b *testing.B) {
@@ -252,7 +252,7 @@ func BenchmarkStruct(b *testing.B) {
 			Age  int
 		}{Name: "Player", Age: 123},
 			struct{ Item string }{Item: "Potion"},
-		))
+		)...)
 	gotwant.Test(b, s, "Player's age is 123, and has Potion")
 
 	b.Run("nm", func(b *testing.B) {
@@ -265,7 +265,7 @@ func BenchmarkStruct(b *testing.B) {
 					Age  int
 				}{Name: "Player", Age: 123},
 					struct{ Item string }{Item: "Potion"},
-				))
+				)...)
 		}
 	})
 }
@@ -289,7 +289,7 @@ func BenchmarkFprintf(b *testing.B) {
 			buf.Reset()
 			nmfmt.Fprintf(buf,
 				"$Name's age is $Age, and has $Item",
-				nmfmt.Named("Name", "Player", "Age", i, "Item", "Potion"),
+				"Name", "Player", "Age", i, "Item", "Potion",
 			)
 		}
 	})
@@ -310,7 +310,7 @@ func BenchmarkSprintf(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			nmfmt.Sprintf(
 				"$Name's age is $Age, and has $Item",
-				nmfmt.Named("Name", "Player", "Age", i, "Item", "Potion"),
+				"Name", "Player", "Age", i, "Item", "Potion",
 			)
 		}
 	})
@@ -339,7 +339,7 @@ func BenchmarkSprintf(b *testing.B) {
 	b.Run("nm 1", func(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			nmfmt.Sprintf("hello, $Name", nmfmt.Named("Name", "Player"))
+			nmfmt.Sprintf("hello, $Name", "Name", "Player")
 		}
 	})
 

@@ -123,7 +123,16 @@ func newCacheNode(format string) cachenode {
 	}
 }
 
-func (c cachenode) construct(a map[string]any, aPool *sync.Pool) (*[]any, error) {
+func findSliceArg(a []any, name string) any {
+	for i := 0; i < len(a)-1; i += 2 {
+		if a[i].(string) == name {
+			return a[i+1]
+		}
+	}
+	return nil
+}
+
+func (c cachenode) construct(a []any, aPool *sync.Pool) (*[]any, error) {
 	if len(c.aorder) == 0 {
 		return nil, nil
 	}
@@ -133,7 +142,7 @@ func (c cachenode) construct(a map[string]any, aPool *sync.Pool) (*[]any, error)
 	*aa = (*aa)[:0]
 
 	for i := 0; i < len(c.aorder); i++ {
-		*aa = append(*aa, a[c.aorder[i]])
+		*aa = append(*aa, findSliceArg(a, c.aorder[i]))
 	}
 
 	return aa, nil

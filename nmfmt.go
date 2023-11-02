@@ -42,18 +42,18 @@ import (
 
 var f Formatter = New()
 
-func Printf(format string, m map[string]any) (int, error) {
-	return f.Printf(format, m)
+func Printf(format string, a ...any) (int, error) {
+	return f.Printf(format, a...)
 }
 
-func Fprintf(w io.Writer, format string, m map[string]any) (int, error) {
-	return f.Fprintf(w, format, m)
+func Fprintf(w io.Writer, format string, a ...any) (int, error) {
+	return f.Fprintf(w, format, a...)
 }
 
-func Sprintf(format string, m map[string]any) string {
-	return f.Sprintf(format, m)
+func Sprintf(format string, a ...any) string {
+	return f.Sprintf(format, a...)
 }
 
-func Errorf(format string, m map[string]any) error {
-	return f.Errorf(format, m)
+func Errorf(format string, a ...any) error {
+	return f.Errorf(format, a...)
 }

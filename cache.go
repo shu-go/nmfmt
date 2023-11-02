@@ -18,7 +18,7 @@ var extract = func(format string, index []int) (string, string) {
 }
 */
 
-var placeholderRE = regexp.MustCompile(`(?:\$(=?\w+)(?::(\w+))?)|(?:\${(=?[^:{}}]+)(?::([^{}}]+))?})`)
+var placeholderRE = regexp.MustCompile(`(?:\$(=?\w+)(?::(\+|#|\w))?)|(?:\${(=?[^:{}}]+)(?::([^{}}]+))?})`)
 var extract = func(format string, index []int) (string, string, bool) {
 	var eq bool
 

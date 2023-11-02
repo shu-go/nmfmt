@@ -141,6 +141,15 @@ func (c cachenode) construct(a []any, aPool *sync.Pool) (*[]any, error) {
 	aa := aPool.Get().(*[]any)
 	*aa = (*aa)[:0]
 
+	if len(a) == 1 {
+		if m, ok := a[0].(M); ok {
+			for i := 0; i < len(c.aorder); i++ {
+				*aa = append(*aa, m[c.aorder[i]])
+			}
+			return aa, nil
+		}
+	}
+
 	for i := 0; i < len(c.aorder); i++ {
 		*aa = append(*aa, findSliceArg(a, c.aorder[i]))
 	}

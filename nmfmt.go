@@ -42,6 +42,8 @@ import (
 
 var f Formatter = New()
 
+type M map[string]any
+
 func Printf(format string, a ...any) (int, error) {
 	return f.Printf(format, a...)
 }

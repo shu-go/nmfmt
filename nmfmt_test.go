@@ -21,6 +21,24 @@ func Example() {
 	// Kim Kim "Kim" "Kim"aaa
 }
 
+func Example_map() {
+	nmfmt.Printf("$name is $age years old.\n",
+		nmfmt.M{
+			"name": "Kim",
+			"age":  22,
+		})
+
+	nmfmt.Printf("$name ${ name } $name:q ${name:q}aaa\n",
+		nmfmt.M{
+			"name": "Kim",
+			"age":  22,
+		})
+
+	// Output:
+	// Kim is 22 years old.
+	// Kim Kim "Kim" "Kim"aaa
+}
+
 func Example_debug() {
 	nmfmt.Printf("$=greeting:q, $=name\n", "name", "Kim", "greeting", "Hello")
 
@@ -343,4 +361,32 @@ func BenchmarkSprintf(b *testing.B) {
 		}
 	})
 
+}
+
+func BenchmarkMapOrSlice(b *testing.B) {
+	b.Run("Map", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			nmfmt.Sprintf(
+				"$Name's age is $Age, and has $Item",
+				nmfmt.M{
+					"Name": "Player",
+					"Age":  i,
+					"Item": "Potion",
+				},
+			)
+		}
+	})
+
+	b.Run("Slice", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			nmfmt.Sprintf(
+				"$Name's age is $Age, and has $Item",
+				"Name", "Player",
+				"Age", i,
+				"Item", "Potion",
+			)
+		}
+	})
 }

@@ -262,32 +262,6 @@ func TestStruct(t *testing.T) {
 	gotwant.Test(t, nmfmt.Sprintf(f, a...), want)
 }
 
-func BenchmarkStruct(b *testing.B) {
-	s := nmfmt.Sprintf(
-		"$Name's age is $Age, and has $Item",
-		nmfmt.Struct(struct {
-			Name string
-			Age  int
-		}{Name: "Player", Age: 123},
-			struct{ Item string }{Item: "Potion"},
-		)...)
-	gotwant.Test(b, s, "Player's age is 123, and has Potion")
-
-	b.Run("nm", func(b *testing.B) {
-		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
-			nmfmt.Sprintf(
-				"$Name's age is $Age, and has $Item",
-				nmfmt.Struct(struct {
-					Name string
-					Age  int
-				}{Name: "Player", Age: 123},
-					struct{ Item string }{Item: "Potion"},
-				)...)
-		}
-	})
-}
-
 func BenchmarkFprintf(b *testing.B) {
 	b.Run("std", func(b *testing.B) {
 		buf := &bytes.Buffer{}
@@ -363,7 +337,7 @@ func BenchmarkSprintf(b *testing.B) {
 
 }
 
-func BenchmarkMapOrSlice(b *testing.B) {
+func BenchmarkArgType(b *testing.B) {
 	b.Run("Map", func(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -387,6 +361,20 @@ func BenchmarkMapOrSlice(b *testing.B) {
 				"Age", i,
 				"Item", "Potion",
 			)
+		}
+	})
+
+	b.Run("Struct", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			nmfmt.Sprintf(
+				"$Name's age is $Age, and has $Item",
+				nmfmt.Struct(struct {
+					Name string
+					Age  int
+				}{Name: "Player", Age: 123},
+					struct{ Item string }{Item: "Potion"},
+				)...)
 		}
 	})
 }

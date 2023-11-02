@@ -38,6 +38,40 @@ func ExampleStruct() {
 	// Kim is 22 years old.
 }
 
+func TestNotation(t *testing.T) {
+	t.Run("Boundary", func(t *testing.T) {
+		gotwant.Test(t, nmfmt.Sprintf("hello, $Name.", nmfmt.Named("Name", "Hoge")), "hello, Hoge.")
+		gotwant.Test(t, nmfmt.Sprintf("hello, $Name", nmfmt.Named("Name", "Hoge")), "hello, Hoge")
+		gotwant.Test(t, nmfmt.Sprintf("$Name, hello", nmfmt.Named("Name", "Hoge")), "Hoge, hello")
+		gotwant.Test(t, nmfmt.Sprintf("$Name, hello.", nmfmt.Named("Name", "Hoge")), "Hoge, hello.")
+
+		gotwant.Test(t, nmfmt.Sprintf("hello, ${Name}.", nmfmt.Named("Name", "Hoge")), "hello, Hoge.")
+		gotwant.Test(t, nmfmt.Sprintf("hello, ${Name}", nmfmt.Named("Name", "Hoge")), "hello, Hoge")
+		gotwant.Test(t, nmfmt.Sprintf("${Name}, hello", nmfmt.Named("Name", "Hoge")), "Hoge, hello")
+		gotwant.Test(t, nmfmt.Sprintf("${Name}, hello.", nmfmt.Named("Name", "Hoge")), "Hoge, hello.")
+	})
+
+	t.Run("Verb", func(t *testing.T) {
+		gotwant.Test(t, nmfmt.Sprintf("$Name:q", nmfmt.Named("Name", "Hoge")), `"Hoge"`)
+		gotwant.Test(t, nmfmt.Sprintf("$Name:q.", nmfmt.Named("Name", "Hoge")), `"Hoge".`)
+		gotwant.Test(t, nmfmt.Sprintf("$Name:#v.", nmfmt.Named("Name", "Hoge")), `"Hoge".`)
+		gotwant.Test(t, nmfmt.Sprintf("$Name:+v.", nmfmt.Named("Name", "Hoge")), `Hoge.`)
+		gotwant.Test(t, nmfmt.Sprintf("$=Name:+v.", nmfmt.Named("Name", "Hoge")), `Name=Hoge.`)
+
+		gotwant.Test(t, nmfmt.Sprintf("${Name:q}", nmfmt.Named("Name", "Hoge")), `"Hoge"`)
+		gotwant.Test(t, nmfmt.Sprintf("${Name:q}.", nmfmt.Named("Name", "Hoge")), `"Hoge".`)
+		gotwant.Test(t, nmfmt.Sprintf("${Name:#v}.", nmfmt.Named("Name", "Hoge")), `"Hoge".`)
+		gotwant.Test(t, nmfmt.Sprintf("${Name:+v}.", nmfmt.Named("Name", "Hoge")), `Hoge.`)
+		gotwant.Test(t, nmfmt.Sprintf("${=Name:+v}.", nmfmt.Named("Name", "Hoge")), `Name=Hoge.`)
+
+		gotwant.Test(t, nmfmt.Sprintf("${ Name:q }", nmfmt.Named("Name", "Hoge")), `"Hoge"`)
+		gotwant.Test(t, nmfmt.Sprintf("${ Name:q }.", nmfmt.Named("Name", "Hoge")), `"Hoge".`)
+		gotwant.Test(t, nmfmt.Sprintf("${ Name:#v }.", nmfmt.Named("Name", "Hoge")), `"Hoge".`)
+		gotwant.Test(t, nmfmt.Sprintf("${ Name:+v }.", nmfmt.Named("Name", "Hoge")), `Hoge.`)
+		gotwant.Test(t, nmfmt.Sprintf("${ =Name:+v }.", nmfmt.Named("Name", "Hoge")), `Name=Hoge.`)
+	})
+}
+
 func TestVSStd(t *testing.T) {
 	cases := []struct {
 		stdinput string

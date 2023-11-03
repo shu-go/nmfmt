@@ -88,6 +88,8 @@ type cachenode struct {
 }
 
 func newCacheNode(format string) cachenode {
+	format = strings.ReplaceAll(format, "%", "%%")
+
 	indices := placeholderRE.FindAllStringSubmatchIndex(format, -1)
 	if len(indices) == 0 {
 		return cachenode{format: format}

@@ -197,6 +197,13 @@ func TestVSStd(t *testing.T) {
 			nminput:  "${=Greeting:q}",
 			nmargs:   []any{"Greeting", "Hello"},
 		},
+		{
+			desc:     "%%",
+			stdinput: "Power=%[1]d%%daze",
+			stdargs:  []any{99},
+			nminput:  "${=Power:d}%daze",
+			nmargs:   []any{"Power", 99},
+		},
 	}
 
 	// also shows how they are inconpatible

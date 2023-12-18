@@ -49,7 +49,9 @@ func (f *Formatter) Printf(format string, a ...any) (int, error) {
 
 	cn := f.cache.get(format)
 
-	aa, err := cn.construct(a, &f.aPool)
+	aa, err := cn.construct(a, func() *[]any {
+		return f.aPool.Get().(*[]any)
+	})
 	if err != nil {
 		return 0, err
 	}
@@ -72,7 +74,9 @@ func (f *Formatter) Fprintf(w io.Writer, format string, a ...any) (int, error) {
 
 	cn := f.cache.get(format)
 
-	aa, err := cn.construct(a, &f.aPool)
+	aa, err := cn.construct(a, func() *[]any {
+		return f.aPool.Get().(*[]any)
+	})
 	if err != nil {
 		return 0, err
 	}
@@ -95,7 +99,9 @@ func (f *Formatter) Sprintf(format string, a ...any) string {
 
 	cn := f.cache.get(format)
 
-	aa, err := cn.construct(a, &f.aPool)
+	aa, err := cn.construct(a, func() *[]any {
+		return f.aPool.Get().(*[]any)
+	})
 	if err != nil {
 		return ""
 	}
@@ -118,7 +124,9 @@ func (f *Formatter) Errorf(format string, a ...any) error {
 
 	cn := f.cache.get(format)
 
-	aa, err := cn.construct(a, &f.aPool)
+	aa, err := cn.construct(a, func() *[]any {
+		return f.aPool.Get().(*[]any)
+	})
 	if err != nil {
 		return err
 	}

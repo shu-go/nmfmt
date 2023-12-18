@@ -134,13 +134,13 @@ func findSliceArg(a []any, name string) any {
 	return nil
 }
 
-func (c cachenode) construct(a []any, aPool *sync.Pool) (*[]any, error) {
+func (c cachenode) construct(a []any, alloc func() *[]any) (*[]any, error) {
 	if len(c.aorder) == 0 {
 		return nil, nil
 	}
 
 	//aa := make([]any, 0, len(c.aorder))
-	aa := aPool.Get().(*[]any)
+	aa := alloc()
 	*aa = (*aa)[:0]
 
 	if len(a) == 1 {

@@ -20,8 +20,8 @@ func CacheResetLimit(misses int) OptionFunc {
 }
 
 type Formatter struct {
-	cache *cache
-	aPool sync.Pool
+	cache       *cache
+	argsBufPool sync.Pool
 }
 
 func New(opts ...OptionFunc) Formatter {
@@ -34,7 +34,7 @@ func New(opts ...OptionFunc) Formatter {
 
 	return Formatter{
 		cache: newCache(fo.cacheResetLimit),
-		aPool: sync.Pool{
+		argsBufPool: sync.Pool{
 			New: func() any {
 				return &[]any{}
 			},
@@ -50,7 +50,7 @@ func (f *Formatter) Printf(format string, a ...any) (int, error) {
 	cn := f.cache.get(format)
 
 	aa, err := cn.construct(a, func() *[]any {
-		return f.aPool.Get().(*[]any)
+		return f.argsBufPool.Get().(*[]any)
 	})
 	if err != nil {
 		return 0, err
@@ -61,7 +61,7 @@ func (f *Formatter) Printf(format string, a ...any) (int, error) {
 		n, err = fmt.Printf(cn.format)
 	} else {
 		n, err = fmt.Printf(cn.format, (*aa)...)
-		f.aPool.Put(aa)
+		f.argsBufPool.Put(aa)
 	}
 
 	return n, err
@@ -75,7 +75,7 @@ func (f *Formatter) Fprintf(w io.Writer, format string, a ...any) (int, error) {
 	cn := f.cache.get(format)
 
 	aa, err := cn.construct(a, func() *[]any {
-		return f.aPool.Get().(*[]any)
+		return f.argsBufPool.Get().(*[]any)
 	})
 	if err != nil {
 		return 0, err
@@ -86,7 +86,7 @@ func (f *Formatter) Fprintf(w io.Writer, format string, a ...any) (int, error) {
 		n, err = fmt.Fprintf(w, cn.format)
 	} else {
 		n, err = fmt.Fprintf(w, cn.format, (*aa)...)
-		f.aPool.Put(aa)
+		f.argsBufPool.Put(aa)
 	}
 
 	return n, err
@@ -100,7 +100,7 @@ func (f *Formatter) Sprintf(format string, a ...any) string {
 	cn := f.cache.get(format)
 
 	aa, err := cn.construct(a, func() *[]any {
-		return f.aPool.Get().(*[]any)
+		return f.argsBufPool.Get().(*[]any)
 	})
 	if err != nil {
 		return ""
@@ -111,7 +111,7 @@ func (f *Formatter) Sprintf(format string, a ...any) string {
 		s = fmt.Sprintf(cn.format)
 	} else {
 		s = fmt.Sprintf(cn.format, (*aa)...)
-		f.aPool.Put(aa)
+		f.argsBufPool.Put(aa)
 	}
 
 	return s
@@ -125,7 +125,7 @@ func (f *Formatter) Errorf(format string, a ...any) error {
 	cn := f.cache.get(format)
 
 	aa, err := cn.construct(a, func() *[]any {
-		return f.aPool.Get().(*[]any)
+		return f.argsBufPool.Get().(*[]any)
 	})
 	if err != nil {
 		return err
@@ -135,7 +135,7 @@ func (f *Formatter) Errorf(format string, a ...any) error {
 		err = fmt.Errorf(cn.format)
 	} else {
 		err = fmt.Errorf(cn.format, (*aa)...)
-		f.aPool.Put(aa)
+		f.argsBufPool.Put(aa)
 	}
 
 	return err

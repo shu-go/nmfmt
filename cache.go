@@ -83,8 +83,8 @@ func (c *cache) get(format string) (cn cachenode) {
 }
 
 type cachenode struct {
-	format string
-	aorder []string
+	format    string
+	argsOrder []string // a slice of names of args
 }
 
 func newCacheNode(format string) cachenode {
@@ -120,8 +120,8 @@ func newCacheNode(format string) cachenode {
 	cformat += format[last:]
 
 	return cachenode{
-		format: cformat,
-		aorder: caorder,
+		format:    cformat,
+		argsOrder: caorder,
 	}
 }
 
@@ -135,7 +135,7 @@ func findSliceArg(a []any, name string) any {
 }
 
 func (c cachenode) construct(a []any, alloc func() *[]any) (*[]any, error) {
-	if len(c.aorder) == 0 {
+	if len(c.argsOrder) == 0 {
 		return nil, nil
 	}
 
@@ -145,15 +145,15 @@ func (c cachenode) construct(a []any, alloc func() *[]any) (*[]any, error) {
 
 	if len(a) == 1 {
 		if m, ok := a[0].(M); ok {
-			for i := 0; i < len(c.aorder); i++ {
-				*aa = append(*aa, m[c.aorder[i]])
+			for i := 0; i < len(c.argsOrder); i++ {
+				*aa = append(*aa, m[c.argsOrder[i]])
 			}
 			return aa, nil
 		}
 	}
 
-	for i := 0; i < len(c.aorder); i++ {
-		*aa = append(*aa, findSliceArg(a, c.aorder[i]))
+	for i := 0; i < len(c.argsOrder); i++ {
+		*aa = append(*aa, findSliceArg(a, c.argsOrder[i]))
 	}
 
 	return aa, nil

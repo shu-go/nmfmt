@@ -1,5 +1,8 @@
 package nmfmt_test
 
+//go:generate go build ./cmd/...
+//go:generate ./nmfmtfmt nmfmt_test.go
+
 import (
 	"bytes"
 	"fmt"
@@ -22,17 +25,11 @@ func Example() {
 }
 
 func Example_map() {
-	nmfmt.Printf("$name is $age years old.\n",
-		nmfmt.M{
-			"name": "Kim",
-			"age":  22,
-		})
+	name := "Kim"
+	age := 22
+	nmfmt.Printf("$name is $age years old.\n", nmfmt.M{"name": name, "age": age})
 
-	nmfmt.Printf("$name ${ name } $name:q ${name:q}aaa\n",
-		nmfmt.M{
-			"name": "Kim",
-			"age":  22,
-		})
+	nmfmt.Printf("$name ${ name } $name:q ${name:q}aaa\n", nmfmt.M{"name": name})
 
 	// Output:
 	// Kim is 22 years old.
@@ -40,7 +37,9 @@ func Example_map() {
 }
 
 func Example_debug() {
-	nmfmt.Printf("$=greeting:q, $=name\n", "name", "Kim", "greeting", "Hello")
+	name := "Kim"
+	greeting := "Hello"
+	nmfmt.Printf("$=greeting:q, $=name\n", nmfmt.M{"greeting": greeting, "name": name})
 
 	// Output:
 	// greeting="Hello", name=Kim
@@ -267,6 +266,38 @@ func TestStruct(t *testing.T) {
 	)
 
 	gotwant.Test(t, nmfmt.Sprintf(f, a...), want)
+}
+
+func TestExtractNames(t *testing.T) {
+	cases := []struct {
+		format string
+		names  map[string]struct{}
+	}{
+		{format: "hoge"},
+		{format: "$name", names: map[string]struct{}{
+			"name": {},
+		}},
+		{format: "$name, $age", names: map[string]struct{}{
+			"name": {},
+			"age":  {},
+		}},
+		{format: "$age, $name", names: map[string]struct{}{
+			"name": {},
+			"age":  {},
+		}},
+		{format: "${ age }, $=name", names: map[string]struct{}{
+			"name": {},
+			"age":  {},
+		}},
+		{format: "${ age:%q }, $=name", names: map[string]struct{}{
+			"name": {},
+			"age":  {},
+		}},
+	}
+
+	for _, c := range cases {
+		gotwant.Test(t, nmfmt.ExtractNames(c.format), c.names, gotwant.Desc(c.format))
+	}
 }
 
 func BenchmarkFprintf(b *testing.B) {

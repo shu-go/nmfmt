@@ -87,6 +87,24 @@ type cachenode struct {
 	argsOrder []string // a slice of names of args
 }
 
+func ExtractNames(format string) map[string]struct{} {
+	indices := placeholderRE.FindAllStringSubmatchIndex(format, -1)
+	if len(indices) == 0 {
+		return nil
+	}
+
+	names := make(map[string]struct{})
+
+	for i := 0; i < len(indices); i++ {
+		index := indices[i]
+
+		name, _, _ := extract(format, index)
+		names[name] = struct{}{}
+	}
+
+	return names
+}
+
 func newCacheNode(format string) cachenode {
 	format = strings.ReplaceAll(format, "%", "%%")
 

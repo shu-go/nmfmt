@@ -137,6 +137,37 @@ func BenchmarkFprintf(b *testing.B) {
 }
 ```
 
+# nmfmtfmt
+
+nmfmtfmt rewrites nmfmt.Xprint to include missing arguments.
+
+## install and execute
+
+```
+$ go install github.com/shu-go/nmfmt/cmd/nmfmtfmt@latest
+
+$ nmfmtfmt hoge.go
+```
+
+## go generate
+
+```go
+//go:generate go install github.com/shu-go/nmfmt/cmd/nmfmtfmt@latest
+//go:generate nmfmtfmt hoge.go
+```
+
+## result
+
+```go
+nmfmt.Printf("$name is $age years old.\n")
+```
+
+vvv
+
+```go
+nmfmt.Printf("$name is $age years old.\n", nmfmt.M{"name": name, "age": age})
+```
+
 ----
 
 Copyright 2023 Shuhei Kubota

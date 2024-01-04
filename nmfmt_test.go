@@ -1,7 +1,7 @@
 package nmfmt_test
 
-//go:generate go build ./cmd/...
-//go:generate ./nmfmtfmt nmfmt_test.go
+//go:generate go install github.com/shu-go/nmfmt/cmd/nmfmtfmt@latest
+//go:generate nmfmtfmt nmfmt_test.go
 
 import (
 	"bytes"

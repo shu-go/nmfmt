@@ -7,7 +7,6 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
-	"strings"
 
 	"github.com/gostaticanalysis/astquery"
 	"github.com/shu-go/gli/v2"
@@ -30,10 +29,10 @@ func (c globalCmd) Run(args []string) error {
 
 	q := astquery.New(fset, []*ast.File{f}, nil)
 	pkgname := "nmfmt"
-	if n, err := q.SelectOne(`//*[@type="ImportSpec" and Path/@Name="github.com/shu-go/nmfmt"]`); err != nil {
+	if n, err := q.SelectOne(`//*[@type="ImportSpec" and Path/@Value='"github.com/shu-go/nmfmt"']`); err != nil {
 		return err
 	} else if imp, ok := n.(*ast.ImportSpec); ok {
-		pkgname = strings.ReplaceAll(imp.Name.Name, `"`, ``)
+		pkgname = imp.Name.Name
 	}
 
 	nodes, err := q.Select(`//*[@type="CallExpr" and Fun[@type="SelectorExpr" and X/@Name="nmfmt" and contains(Sel/@Name, "rint")]]`)
@@ -84,7 +83,7 @@ func (c globalCmd) Run(args []string) error {
 		if !okm {
 			continue
 		}
-		if x, ok := m.X.(*ast.Ident); !ok || x.Name != "nmfmt" || m.Sel.Name != "M" {
+		if x, ok := m.X.(*ast.Ident); !ok || x.Name != pkgname || m.Sel.Name != "M" {
 			continue
 		}
 

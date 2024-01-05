@@ -7,10 +7,11 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
+	"strings"
 
-	"github.com/gostaticanalysis/astquery"
 	"github.com/shu-go/gli/v2"
 	"github.com/shu-go/nmfmt"
+	"golang.org/x/tools/go/ast/astutil"
 )
 
 type globalCmd struct {
@@ -27,18 +28,20 @@ func (c globalCmd) Run(args []string) error {
 		return err
 	}
 
-	q := astquery.New(fset, []*ast.File{f}, nil)
 	pkgname := "nmfmt"
-	if n, err := q.SelectOne(`//*[@type="ImportSpec" and Path/@Value='"github.com/shu-go/nmfmt"']`); err != nil {
-		return err
-	} else if imp, ok := n.(*ast.ImportSpec); ok {
+	if imp := find(f, func(n *ast.ImportSpec) bool {
+		return strings.HasPrefix(n.Path.Value, `"github.com/shu-go/nmfmt`)
+	}); imp != nil && imp.Name != nil {
 		pkgname = imp.Name.Name
 	}
 
-	nodes, err := q.Select(`//*[@type="CallExpr" and Fun[@type="SelectorExpr" and X/@Name="nmfmt" and contains(Sel/@Name, "rint")]]`)
-	if err != nil {
-		return err
-	}
+	//nodes, err := q.Select(`//*[@type="CallExpr" and Fun[@type="SelectorExpr" and X/@Name="` + pkgname + `" and contains(Sel/@Name, "rint")]]`)
+	nodes := findAll(f, func(n *ast.CallExpr) bool {
+		fun := conv[ast.SelectorExpr](n.Fun)
+		x := conv[ast.Ident](fun.X)
+		sel := conv[ast.Ident](fun.Sel)
+		return x.Name == pkgname && strings.Contains(sel.Name, "rint")
+	})
 
 	changed := false
 
@@ -47,7 +50,6 @@ func (c globalCmd) Run(args []string) error {
 		//                     ^^^^^^^^^^^^^^^^^^
 		// filtering nmfmt.xxx("literal")
 		//                     ^^^^^^^^^
-		n := n.(*ast.CallExpr)
 
 		if len(n.Args) == 0 || len(n.Args) > 2 {
 			continue
@@ -158,6 +160,49 @@ func (c globalCmd) Run(args []string) error {
 
 	return nil
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+func find[T any](root ast.Node, test func(n T) bool) T {
+	var result T
+	astutil.Apply(root, func(c *astutil.Cursor) bool {
+		if n, ok := c.Node().(T); ok {
+			if test(n) {
+				result = n
+				return false
+			}
+		}
+		return true
+	}, nil)
+	return result
+}
+
+func findAll[T any](root ast.Node, test func(n T) bool) []T {
+	var result []T
+	astutil.Apply(root, func(c *astutil.Cursor) bool {
+		if n, ok := c.Node().(T); ok {
+			if test(n) {
+				if result == nil {
+					result = make([]T, 0, 1)
+				}
+				result = append(result, n)
+			}
+		}
+		return true
+	}, nil)
+	return result
+}
+
+func conv[T any, P *T](n ast.Node) P {
+	if c, ok := n.(P); ok {
+		return c
+	}
+
+	var zero T
+	return &zero
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 // Version is app version
 var Version string
